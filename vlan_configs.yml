@@ -4,7 +4,8 @@
   gather_facts: false
   connection: local
 
-  vars: 
+  vars:
+    ansible_python_interpreter: /usr/bin/python3 
     cli: 
       username: carter
       password: cisco
@@ -16,3 +17,16 @@
         provider: "{{ cli }}"
         lines:
           - vlan 10
+          - vlan 20
+          - vlan 30
+          - vlan 40
+          - vlan 50
+          - vlan 60
+          - vlan 70
+          - vlan 80
+          - vlan 90
+          - vlan 100
+      
+      register: print_vlan_output
+
+    - debug: var=print_vlan_output
