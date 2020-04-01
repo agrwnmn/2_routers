@@ -1,5 +1,5 @@
 ---
-- name: Configure Switchports
+- name: Configure Switch
   hosts: switches
   gather_facts: false
   connection: local
