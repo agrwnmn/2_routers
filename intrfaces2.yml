@@ -1,0 +1,19 @@
+---
+- name: Configure Switchports
+  hosts: switches
+  gather_facts: false
+  connection: network_cli
+
+  tasks: 
+    - name: Interface configurations
+      ios_config:
+        authorize: yes
+        parents: interface {{ "item.interface" }}
+        lines: 
+          - "switchport access vlan {{ item.vlan }}"
+          - "switchport access vlan {{ item.voice_vlan}}"
+          - no shutdown
+
+      with_items:
+        - { interface : GigabitEthernet2/1, vlan: 40, voice_vlan: 50 }
+        - { interface : GigabitEthernet2/2, vlan: 40, voice_vlan: 50 }
