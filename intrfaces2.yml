@@ -2,12 +2,17 @@
 - name: Configure Switchports
   hosts: switches
   gather_facts: false
-  connection: network_cli
+  connection: local
 
-  tasks: 
+  tasks:
+    - name: Get login credentials
+      include_vars: group_vars/secrets.yml
+
+
     - name: Interface configurations
       ios_config:
         authorize: yes
+        transport: network_cli
         parents: interface {{ "item.interface" }}
         lines: 
           - "switchport access vlan {{ item.vlan }}"
