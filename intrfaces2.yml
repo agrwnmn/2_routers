@@ -8,15 +8,22 @@
     - name: Get login credentials
       include_vars: group_vars/secrets.yml
 
+    - name: Set credentials
+      set_fact: 
+        provider: 
+          username: "{{ creds ['username'] }}"
+          password: "{{ creds ['password'] }}"
 
     - name: Interface configurations
       ios_config:
+        provider: "{{ provider }}"
         authorize: yes
         transport: network_cli
         parents: interface {{ "item.interface" }}
         lines: 
           - "switchport access vlan {{ item.vlan }}"
           - "switchport access vlan {{ item.voice_vlan}}"
+        after:
           - no shutdown
 
       with_items:
