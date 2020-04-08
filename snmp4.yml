@@ -1,0 +1,24 @@
+---   
+- name: Create SNMP config on devices
+  hosts: switches
+  gather_facts: no
+  connection: network_cli
+  
+  vars:
+    ansible_python_interpreter: /usr/bin/python3.8
+  
+  tasks:
+    - name: Gather login info
+      include_vars: group_vars/secrets2.yml
+
+    - name: Deploy SNMP commands from config file
+      ios_config:
+        authorize: yes
+#        provider: "{{ ios_provider }}"
+        src: "config/snmp.cfg"
+    
+      register: print_snmp_output
+
+    - debug: var=print_snmp_output
+
+
