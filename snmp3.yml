@@ -1,0 +1,25 @@
+---
+- name: SNMP
+  hosts: switches
+  gather_facts: false
+  connection: network_cli
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python3.8
+
+  tasks:
+    - name: Gather login info
+      include_vars: group_vars/secrets.yml
+
+    - name: Add SNMP configs
+      ios_config:
+        authorize: yes
+        lines:
+          - snmp-server community clo rw
+          - snmp-server community cat ro
+          - snmp-server community car ro
+          - snmp-server community can ro 
+
+      register: print_snmp_output
+
+    - debug: var=print_snmp_output
