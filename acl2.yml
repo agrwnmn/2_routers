@@ -1,0 +1,32 @@
+---
+
+- name: ACLs and SNMP configs
+  hosts: switches
+  gather_facts: false
+  connection: network_cli
+
+  vars: 
+    ansible_python_interpreter: /usr/bin/python3.8
+
+  tasks:
+    - name: Gather login info
+      include_vars: group_vars/secrets2.yml
+
+    - name: Create SNMP configs from file
+      ios_config:
+        authorize: yes
+        src: configs/snmp.yml
+
+      register: print_output_SNMP
+
+    - name: Create ACL configs from file
+      ios_config:
+        authorize: yes
+        src: configs/acl.yml
+
+      register: print_output_ACL
+
+    - debug: var=print_output_SNMP
+    - debug: var=print_output_ACL
+
+
