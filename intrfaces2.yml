@@ -2,24 +2,19 @@
 - name: Configure Switchports
   hosts: switches
   gather_facts: false
-  connection: local
+  connection: network_cli
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python3.8
 
   tasks:
     - name: Get login credentials
-      include_vars: group_vars/secrets.yml
-
-    - name: Set credentials
-      set_fact: 
-        provider: 
-          username: "{{ creds ['username'] }}"
-          password: "{{ creds ['password'] }}"
+      include_vars: group_vars/secrets2.yml
 
     - name: Interface configurations
       ios_config:
-        provider: "{{ provider }}"
         authorize: yes
-        transport: network_cli
-        parents: interface {{ "item.interface" }}
+        parents: "interface {{ item.interface }}"
         lines: 
           - "switchport access vlan {{ item.vlan }}"
           - "switchport access vlan {{ item.voice_vlan}}"
