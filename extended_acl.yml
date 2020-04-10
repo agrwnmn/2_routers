@@ -38,6 +38,6 @@
     - debug: var=updated_configs
 
     - name: "Task 04: Write Output files"
-         copy:
+      copy:
         content: "{{ updated_configs.stdout[0] }} \n{{ updated_configs.stdout[1] }}\n"
         dest: "outputs/{{ inventory_hostname }}.txt"
