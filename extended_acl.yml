@@ -12,23 +12,28 @@
     - name: "Task 01: Gather login info"
       include_vars: group_vars/secrets2.yml
 
-    - name: "Task 02: Show SNMP config"
+    - name: "Task 02: Show existing SNMP and ACL config"
       ios_command:
         authorize: yes
         commands:
+          - show run | sec access-list
           - show run | sec snmp
-          - show run | sec access-lists
 
-      register: print_existing_configs
+      register: existing_configs
 
-    - debug: var=print_existing_configs
+    - debug: var=existing_configs
 
-    - name: "Task 03: Update ACLs"
+    - name: "Task 03: Write old configs"
+      copy:
+        content: "{{ existing_configs.stdout[0] }} \n{{ existing_configs.stdout[1] }}"
+        dest: "outputs/{{ inventory_hostname }}-old.txt"
+
+    - name: "Task 04: Update ACLs"
       ios_config:
         authorize: yes
         src: configs/acl2.cfg
 
-    - name: "Task 04: Show Updated Config"
+    - name: "Task 05: Show Updated Config"
       ios_command:
         commands:
           - show run | sec access-list
@@ -37,7 +42,7 @@
       register: updated_configs
     - debug: var=updated_configs
 
-    - name: "Task 04: Write Output files"
+    - name: "Task 06: Write Output files"
       copy:
         content: "{{ updated_configs.stdout[0] }} \n{{ updated_configs.stdout[1] }}\n"
-        dest: "outputs/{{ inventory_hostname }}.txt"
+        dest: "outputs/{{ inventory_hostname }}-new.txt"
