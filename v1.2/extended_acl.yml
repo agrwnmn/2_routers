@@ -1,0 +1,49 @@
+---
+
+- name: Updated Extended ACL
+  hosts: all
+  gather_facts: false
+  connection: network_cli
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python3.8
+
+  tasks:
+    - name: "Task 01: Gather login info"
+      include_vars: group_vars/secrets2.yml
+
+    - name: "Task 02: Show existing SNMP and ACL config"
+      ios_command:
+        authorize: yes
+        commands:
+          - show run | sec access-list
+          - show run | sec snmp
+
+      register: existing_configs
+
+    - debug: var=existing_configs
+
+    - name: "Task 03: Write old configs to file"
+      copy:
+        content: "{{ existing_configs.stdout[0] }} \n{{ existing_configs.stdout[1] }}"
+        dest: "outputs/{{ inventory_hostname }}-old.txt"
+
+    - name: "Task 04: Update ACLs"
+      ios_config:
+        authorize: yes
+        src: configs/acl2.cfg
+        save_when: changed
+
+    - name: "Task 05: Show Updated Config"
+      ios_command:
+        commands:
+          - show run | sec access-list
+          - show run | sec snmp
+
+      register: updated_configs
+    - debug: var=updated_configs
+
+    - name: "Task 06: Write Output files"
+      copy:
+        content: "{{ updated_configs.stdout[0] }} \n{{ updated_configs.stdout[1] }}\n"
+        dest: "outputs/{{ inventory_hostname }}-new.txt"
