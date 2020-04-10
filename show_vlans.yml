@@ -9,17 +9,36 @@
     ansible_python_interpreter: /usr/bin/python3.8
 
   tasks:
-    - name: Gather login creds
+    - name: "Task 1: Gather login creds"
       include_vars: group_vars/secrets2.yml
 
-    - name: Gather VLAN info
+    - name: "Task 2: Gather VLAN info"
       ios_command:
         commands:
-          - show version 
+          - show version
           - show vlan brief
           - show run | sec snmp
           - show run | sec access-list
 
-      register: print_vlan_output
+      register: vlan_result
 
-    - debug: var=print_vlan_output
+#    - name: "Task 3: Print info"
+#     debug:
+#        msg: "{{ vlan_result }}"
+
+    - name: "Task 4: Create output folder"
+      file:
+        path: "outputs"
+        state: directory
+      run_once: true
+
+    - name: "Task 5: Write output to file"
+      copy:
+        content: "{{ vlan_result.stdout[0] }} , {{ vlan_result.stdout[1] }}\n"
+        dest: "outputs/{{ inventory_hostname }}.txt"
+#        content: "{{ vlan_result.stdout[1] }}\n"
+#        dest: "outputs/{{ inventory_hostname }}-2.txt"
+#        content: "{{ vlan_result.stdout[1] }}\n"
+#        dest: "outputs/{{ inventory_hostname }}-3.txt"
+#        content: "{{ vlan_result.stdout[3] }}\n"
+#        dest: "outputs/{{ inventory_hostname }}-4.txt"
